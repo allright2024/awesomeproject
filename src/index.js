@@ -11,12 +11,19 @@ const translate = require('@vitalets/google-translate-api');
 const imageRouter = require('./routes/image');
 
 const app = express();
-app.use(helmet());
 app.use(express.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(morgan('dev'));
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(morgan('combined'));
+  app.use(hpp());
+  app.use(helmet());
+} else {
+  app.use(morgan('dev'));
+}
+
 app.use('/', express.static(path.join(__dirname, 'uploads')));
 
 const translates = new Translate();
