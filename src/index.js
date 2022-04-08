@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const hpp = require('hpp');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
@@ -18,8 +19,6 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use('/', express.static(path.join(__dirname, 'uploads')));
 
-app.set('port', process.env.PORT || 5000);
-
 const translates = new Translate();
 const client = new vision.ImageAnnotatorClient();
 
@@ -37,13 +36,13 @@ app.get('/api/translate', async (req, res) => {
     console.log('Translations:');
     console.log(translations);
 
-    res.json(translate);
+    res.json({ translate: translations });
   } catch (err) {
     console.error(err);
     translate(detections[0].description, { to: 'en' })
       .then((res) => {
         console.log(res.text);
-        res.json(res.text);
+        res.json({ translate: res.text });
         //=> I speak English
         // console.log(res.from.language.iso);
         //=> nl
@@ -64,6 +63,6 @@ app.get('/api/translate', async (req, res) => {
 
 app.use('/image', imageRouter);
 
-app.listen(app.get('port'), () => {
-  console.log('Express server listening on port ' + app.get('port'));
+app.listen(80, () => {
+  console.log('Express server listening on port ' + '80');
 });
