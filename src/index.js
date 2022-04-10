@@ -12,7 +12,7 @@ const AWS = require('aws-sdk');
 const multerS3 = require('multer-s3');
 const multer = require('multer');
 
-const imageRouter = require('./routes/image');
+const postRouter = require('./routes/post');
 
 dotenv.config();
 
@@ -35,17 +35,6 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   app.use(morgan('dev'));
 }
-
-const upload = multer({
-  storage: multerS3({
-    s3: new AWS.S3(),
-    bucket: 'awesomegnnc',
-    key(req, file, db) {
-      db(null, `original/${Date.now()}_${path.basename(file.originalname)}`);
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 },
-});
 
 app.use('/', express.static(path.join(__dirname, 'uploads')));
 
@@ -95,12 +84,39 @@ app.get('/api/translate', async (req, res) => {
   }
 });
 
-app.get('/sub', upload.array('image'), async (req, res) => {
-  console.log(req.files);
-  res.json9req.files.map((v) => v.location);
+app.post('/files', (req, res, next) => {
+  const reqFiles = [];
+  try {
+    upload(req, res, function (err) {
+      if (err) {
+        return res.status(400).send({
+          //에러발생하면, 에러 메시지와 빈 파일명 array를 return한다.
+          message: err.message,
+          files: reqFiles,
+        });
+      }
+
+      for (var i = 0; i < req.files.length; i++) {
+        //저장된 파일명을 차례로 push한다.
+        reqFiles.push(req.files[i].filename);
+      }
+
+      res.status(200).send({
+        //저장 성공 시, 저장성공 메시지와 저장된 파일명 array를 return한다.
+        message: 'Uploaded the file successfully',
+        files: reqFiles,
+      });
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: `Could not upload the file: ${err}`,
+      files: reqFiles,
+    });
+  }
 });
 
-app.use('/image', imageRouter);
+app.use('/post', postRouter);
 
 app.listen(80, () => {
   console.log('Express server listening on port ' + '80');
