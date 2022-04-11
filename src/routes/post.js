@@ -1,9 +1,15 @@
 const express = require('express');
 const multer = require('multer');
 const sharp = require('sharp');
+const { Translate } = require('@google-cloud/translate').v2;
+const translate = require('@vitalets/google-translate-api');
+const vision = require('@google-cloud/vision');
 
 const path = require('path');
 const fs = require('fs');
+
+const translates = new Translate();
+const client = new vision.ImageAnnotatorClient();
 
 const router = express.Router();
 
@@ -41,7 +47,7 @@ async function clean(file) {
   });
 }
 
-router.post('/images', uploadPhoto.single('photo'), (req, res) => {
+router.post('/images', uploadPhoto.single('photo'), async(req, res) => {
   var _uid = req.body.uid;
   var file = req.file;
   if (file) {
@@ -51,6 +57,20 @@ router.post('/images', uploadPhoto.single('photo'), (req, res) => {
       } else {
         console.log(file.filename);
         console.log('resize ok !');
+
+        const [result] = await client.textDetection('./uploads/'+file.filename);
+
+        const detections = result.textAnnotations;
+
+        try{
+          let [translations] = await translates.translate(detections[0].description,'en');
+          res.json({translate:translations, boundingPoly:detections[0].boundingPoly})
+        }catch(err){
+          translate(detections[0].description,{to: 'en'}).then(res=>{
+            res.json({translate:res.text, boundingPoly:detections[0].boundingPoly});
+          })
+        }
+
         clean('./uploads/' + file.filename);
       }
     });
