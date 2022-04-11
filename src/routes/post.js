@@ -33,6 +33,14 @@ var storagePhotos = multer.diskStorage({
 
 var uploadPhoto = multer({ storage: storagePhotos });
 
+async function clean(file) {
+  fs.unlink(file, function (err) {
+    if (err) {
+      console.log('Error : ', err);
+    }
+  });
+}
+
 router.post('/images', uploadPhoto.single('photo'), (req, res) => {
   var _uid = req.body.uid;
   var file = req.file;
@@ -43,6 +51,7 @@ router.post('/images', uploadPhoto.single('photo'), (req, res) => {
       } else {
         console.log(file.filename);
         console.log('resize ok !');
+        clean(file.filename);
       }
     });
   } else throw 'error';
