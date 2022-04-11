@@ -1,5 +1,7 @@
 const express = require('express');
 const multer = require('multer');
+const sharp = require('sharp');
+
 const path = require('path');
 const fs = require('fs');
 
@@ -12,25 +14,38 @@ try {
   fs.mkdirSync('uploads');
 }
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination(req, file, done) {
-      done(null, 'uploads');
-    },
-    filename(req, file, done) {
-      // 제로초.png
-      const ext = path.extname(file.originalname); // 확장자 추출(.png)
-      const basename = path.basename(file.originalname, ext); // 제로초
-      done(null, basename + '_' + new Date().getTime() + ext); // 제로초15184712891.png
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+var storagePhotos = multer.diskStorage({
+  filename: (req, file, cb) => {
+    console.log(file);
+    var filetype = '';
+    if (file.mimetype === 'image/gif') {
+      filetype = 'gif';
+    }
+    if (file.mimetype === 'image/png') {
+      filetype = 'png';
+    }
+    if (file.mimetype === 'image/jpeg') {
+      filetype = 'jpg';
+    }
+    cb(null, 'profile-' + new Date().toISOString() + '.' + filetype);
+  },
 });
 
-router.post('/images', upload.array('image'), (req, res, next) => {
-  // POST /post/images
-  console.log(req.files);
-  res.json({ file: req.files });
+var uploadPhoto = multer({ storage: storagePhotos });
+
+router.post('/images', uploadPhoto.single('photo'), (req, res) => {
+  var _uid = req.body.uid;
+  var file = req.file;
+  if (file) {
+    sharp(file.path).toFile('./uploads/' + file.filename, function (err) {
+      if (err) {
+        console.log('sharp>>>', err);
+      } else {
+        console.log(file.filename);
+        console.log('resize ok !');
+      }
+    });
+  } else throw 'error';
 });
 
 module.exports = router;

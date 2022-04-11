@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
 const vision = require('@google-cloud/vision');
 const { Translate } = require('@google-cloud/translate').v2;
 const translate = require('@vitalets/google-translate-api');
@@ -27,6 +28,8 @@ app.use(express.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use('/uploads', express.static('uploads'));
 
 if (process.env.NODE_ENV === 'production') {
   app.use(morgan('combined'));
