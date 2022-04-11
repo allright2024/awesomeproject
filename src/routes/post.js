@@ -51,7 +51,7 @@ router.post('/images', uploadPhoto.single('photo'), (req, res) => {
       } else {
         console.log(file.filename);
         console.log('resize ok !');
-        clean(file.filename);
+        clean('./uploads/' + file.filename);
       }
     });
   } else throw 'error';
