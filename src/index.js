@@ -45,78 +45,70 @@ const translates = new Translate();
 const client = new vision.ImageAnnotatorClient();
 
 app.get('/api/basic', async (req, res) => {
-  const [result] = await client.textDetection('./src/s.png');
-
-  console.log('Result: ');
-
-  const detections = result.textAnnotations;
-  console.log('Detections: ');
-  console.log(detections[0].boundingPoly);
-  res.json({ info: detections[0].boundingPoly });
+  // const [result] = await client.textDetection('./src/s.png');
+  // console.log('Result: ');
+  // const detections = result.textAnnotations;
+  // console.log('Detections: ');
+  // console.log(detections[0].boundingPoly);
+  // res.json({ info: detections[0].boundingPoly });
 });
 
 app.get('/api/translate', async (req, res) => {
-  const [result] = await client.textDetection('./src/s.png');
-
-  console.log('Result: ');
-
-  const detections = result.textAnnotations;
-  console.log('Detections: ');
-  console.log(detections[0]);
-
-  try {
-    let [translations] = await translates.translate(detections[0].description, 'en');
-    console.log('Translations:');
-    console.log(translations);
-
-    res.json({ translate: translations });
-  } catch (err) {
-    console.error(err);
-    translate(detections[0].description, { to: 'en' })
-      .then((res) => {
-        console.log(res.text);
-        res.json({ translate: res.text });
-        //=> I speak English
-        // console.log(res.from.language.iso);
-        //=> nl
-      })
-      .catch((err) => {
-        console.error(err);
-        res.json({ err: err });
-      });
-  }
+  // const [result] = await client.textDetection('./src/s.png');
+  // console.log('Result: ');
+  // const detections = result.textAnnotations;
+  // console.log('Detections: ');
+  // console.log(detections[0]);
+  // try {
+  //   let [translations] = await translates.translate(detections[0].description, 'en');
+  //   console.log('Translations:');
+  //   console.log(translations);
+  //   res.json({ translate: translations });
+  // } catch (err) {
+  //   console.error(err);
+  //   translate(detections[0].description, { to: 'en' })
+  //     .then((res) => {
+  //       console.log(res.text);
+  //       res.json({ translate: res.text });
+  //       //=> I speak English
+  //       // console.log(res.from.language.iso);
+  //       //=> nl
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //       res.json({ err: err });
+  //     });
+  // }
 });
 
 app.post('/files', (req, res, next) => {
-  const reqFiles = [];
-  try {
-    upload(req, res, function (err) {
-      if (err) {
-        return res.status(400).send({
-          //에러발생하면, 에러 메시지와 빈 파일명 array를 return한다.
-          message: err.message,
-          files: reqFiles,
-        });
-      }
-
-      for (var i = 0; i < req.files.length; i++) {
-        //저장된 파일명을 차례로 push한다.
-        reqFiles.push(req.files[i].filename);
-      }
-
-      res.status(200).send({
-        //저장 성공 시, 저장성공 메시지와 저장된 파일명 array를 return한다.
-        message: 'Uploaded the file successfully',
-        files: reqFiles,
-      });
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({
-      message: `Could not upload the file: ${err}`,
-      files: reqFiles,
-    });
-  }
+  // const reqFiles = [];
+  // try {
+  //   upload(req, res, function (err) {
+  //     if (err) {
+  //       return res.status(400).send({
+  //         //에러발생하면, 에러 메시지와 빈 파일명 array를 return한다.
+  //         message: err.message,
+  //         files: reqFiles,
+  //       });
+  //     }
+  //     for (var i = 0; i < req.files.length; i++) {
+  //       //저장된 파일명을 차례로 push한다.
+  //       reqFiles.push(req.files[i].filename);
+  //     }
+  //     res.status(200).send({
+  //       //저장 성공 시, 저장성공 메시지와 저장된 파일명 array를 return한다.
+  //       message: 'Uploaded the file successfully',
+  //       files: reqFiles,
+  //     });
+  //   });
+  // } catch (err) {
+  //   console.log(err);
+  //   res.status(500).send({
+  //     message: `Could not upload the file: ${err}`,
+  //     files: reqFiles,
+  //   });
+  // }
 });
 
 app.use('/post', postRouter);

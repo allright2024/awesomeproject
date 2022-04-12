@@ -50,7 +50,9 @@ async function clean(file) {
 router.post('/images', uploadPhoto.single('photo'), async (req, res) => {
   var _uid = req.body.uid;
   var file = req.file;
-  console.log(req.query.lang);
+  if (req.query.code !== 'my 1st app project') {
+    return res.status(500).send('no auth');
+  }
   var lang = req.query.lang;
 
   let langCode;
