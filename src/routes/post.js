@@ -50,6 +50,7 @@ async function clean(file) {
 router.post('/images', uploadPhoto.single('photo'), async (req, res) => {
   var _uid = req.body.uid;
   var file = req.file;
+  console.log(req.query.lang);
   if (file) {
     sharp(file.path).toFile('./uploads/' + file.filename, async function (err) {
       if (err) {
