@@ -44,6 +44,10 @@ app.use('/', express.static(path.join(__dirname, 'uploads')));
 const translates = new Translate();
 const client = new vision.ImageAnnotatorClient();
 
+app.get('/asdf/asdfqwe', (req, res) => {
+  res.json({ id: 1 });
+});
+
 app.get('/api/basic', async (req, res) => {
   // const [result] = await client.textDetection('./src/s.png');
   // console.log('Result: ');
