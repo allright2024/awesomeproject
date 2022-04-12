@@ -172,6 +172,8 @@ router.post('/images', uploadPhoto.single('photo'), async (req, res) => {
       langCode = 'ko';
   }
 
+  console.log(langCode);
+
   if (file) {
     sharp(file.path).toFile('./uploads/' + file.filename, async function (err) {
       if (err) {
